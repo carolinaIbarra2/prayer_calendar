@@ -1,0 +1,111 @@
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario de Diciembre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Agrega estilos básicos */
+        body { margin: 0; padding: 20px; font-family: 'Roboto', sans-serif; background-color: #f5f5f5; color: #333; box-sizing: border-box; }
+        .main-container { padding: 10px; max-width: 100%; margin: 0 auto; }
+        .menu-container, .calendar-container { margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; }
+        h1, h2, th, td, select, button, ul, label { font-family: 'Roboto', sans-serif; }
+        h1 {margin-left:12px;}
+        p { font-family: 'Roboto', sans-serif; color: red; }
+        select, button { padding: 8px; margin-top: 10px; }
+        button { background: lightblue}
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { text-align: center; padding: 5px; border: 1px solid #ddd; }
+        td { height: 100px; background-color: #f9f9f9; position: relative; }
+        td:hover { background-color: #e0f7fa; }
+        .selected-day { background-color: lightyellow; color: #white; font-weight: bold; }
+        .completed { background-color: green; color: blue; font-weight: bold; }
+        .current-day { color: blue; font-weight: bold; }
+        .default-day { background-color: yellow: }
+        ul { list-style-type: none; margin: 0; padding:0; font-weight: normal; font-size: 0.7em; }
+
+        /* Estilos para dispositivos pequeños */
+        @media (max-width: 400px) {
+            h1 { font-size: 0.8em; margin-left:20px; margin-bottom: 0; }
+            h2, label { font-size: 0.8em; }
+            p { color: red; font-size: 0.8em; }
+            button { font-size: 0.9em; }
+            td { font-size: 0.8em; height: 70px; }
+            th { font-size: 0.6em; height: 40px; }
+            ul { font-size: 0.7em; } 
+            .calendar-container { padding: 5px; } 
+            .main-container { padding: 10px; max-width: 100%; margin: 0 auto; }  
+            .menu-container { padding: 5px; max-width: 100%; margin: 0 auto; }     
+        }
+
+     
+    </style>
+</head>
+<body>
+    <h1>Calendario de Diciembre</h1>
+    <div class="main-container">
+        <div class="menu-container">
+            <form method="post">
+                {% csrf_token %}
+                <label for="person">Selecciona tu NOMBRE:</label>
+                <select name="person" id="person">
+                    {% for person in people %}
+                        <option value="{{ person.id }}">{{ person.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" name="submit_button">Hoy realice mi oración Bastión</button>
+            </form>
+            {% if message %}
+                <p>{{ message }}</p>
+            {% endif %}
+        </div>
+
+        <div class="calendar-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Domingo</th>
+                        <th>Lunes</th>
+                        <th>Martes</th>
+                        <th>Miércoles</th>
+                        <th>Jueves</th>
+                        <th>Viernes</th>
+                        <th>Sábado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for week in month_calendar %}
+                        <tr>
+                            {% for day in week %}
+                            <td class="
+                                {% if day != 0 %}
+                                    {% if day == current_day %}current-day{% endif %}
+                                    {% if day_colors|get_item:day|default_if_none:'yellow' == 'green' %}completed{% endif %}
+                                    {% if day_colors|get_item:day|default_if_none:'yellow' == 'yellow' %}default-day{% endif %}
+                                {% endif %}
+                                   ">
+                                {% if day != 0 %}
+                                    <div>{{ day }}</div>                                    
+                                    {% if completions_by_day|key_exists:day %}
+                                        <ul>
+                                            {% for name in completions_by_day|key_get:day %}
+                                                <li>{{ name }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    
+                    
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
